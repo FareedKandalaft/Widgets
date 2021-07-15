@@ -18,10 +18,41 @@ const Search = () => {
 
       setResults(data.query.search);
     };
-    if (term) {
+
+    if (term && !results.length) {
       search();
+    } else {
+      const timeoutId = setTimeout(() => {
+        if (term) {
+          search();
+        }
+      }, 1000);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
     }
   }, [term]);
+
+  const renderedResults = results.map((result) => {
+    return (
+      <div className='item' key={result.pageid}>
+        <div className='right floated content'>
+          <a
+            href={`https://en.wikipedia.org?curid=${result.pageid}`}
+            className='ui button'
+          >
+            Go
+          </a>
+        </div>
+        <div className='content'>
+          <div className='header'>{result.title}</div>
+          <span dangerouslySetInnerHTML={{ __html: result.snippet }}></span>
+        </div>
+      </div>
+    );
+  });
+
   return (
     <div>
       <div className='ui form'>
@@ -35,6 +66,7 @@ const Search = () => {
           />
         </div>
       </div>
+      <div className='ui celled list'>{renderedResults}</div>
     </div>
   );
 };
